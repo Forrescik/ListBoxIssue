@@ -23,7 +23,7 @@ namespace ListBoxIssue
             LayoutUpdated += OnLayoutUpdated;
         }
 
-        private void OnLayoutUpdated(object sender, EventArgs eventArgs)
+        private static void OnLayoutUpdated(object sender, EventArgs eventArgs)
         {
             if (sender != null)
             {
@@ -32,7 +32,7 @@ namespace ListBoxIssue
 
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
+        private static void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
             PresentationSource presentationSource = PresentationSource.FromVisual((Visual)sender);
 
@@ -43,11 +43,9 @@ namespace ListBoxIssue
             }
         }
 
-        private void TestUserControl_ContentRendered(object sender, EventArgs e)
+        private static void TestUserControl_ContentRendered(object sender, EventArgs e)
         {
             ((PresentationSource)sender).ContentRendered -= TestUserControl_ContentRendered;
-
-
         }
     }
 }

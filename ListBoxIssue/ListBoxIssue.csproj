@@ -79,10 +79,12 @@
     <Compile Include="BubbleUserControl.xaml.cs">
       <DependentUpon>BubbleUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ListBoxExtension.cs" />
     <Compile Include="ScrollListBoxBehavior.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MessageViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="VisualTreeHelperTemp.cs" />
     <Page Include="BubbleUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
