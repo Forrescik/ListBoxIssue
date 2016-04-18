@@ -16,10 +16,10 @@
     </DataTemplate>
     <DataTemplate x:Key="ListBoxDataTemplate" DataType="{x:Type viewModel:MessageViewModel}">
         <ListBox ItemsSource="{Binding MessageViewModels}" ItemTemplate="{StaticResource ListBoxItemTemplate}"
-                                ScrollViewer.CanContentScroll="False" VirtualizingStackPanel.IsVirtualizing="False">
+                                ScrollViewer.CanContentScroll="{Binding ElementName=ScrollListBoxBehavior, Path=IsScrollFluent}" VirtualizingStackPanel.IsVirtualizing="False">
             
                 <interactivity:Interaction.Behaviors>
-                    <local:ScrollListBoxBehavior IsOnTop="{Binding AddNewItems}" SetScrollbarPosition="{Binding ItemsCounter, Mode=TwoWay}"/>
+                    <local:ScrollListBoxBehavior x:Name="ScrollListBoxBehavior" IsOnTop="{Binding AddNewItems}" SetScrollbarPosition="{Binding ItemsCounter, Mode=TwoWay}"/>
                 </interactivity:Interaction.Behaviors>
             </ListBox>
             

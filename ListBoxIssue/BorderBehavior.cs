@@ -20,23 +20,23 @@ namespace ListBoxIssue
             base.OnAttached();
         }
 
-        private void AssociatedObjectOnRequestBringIntoView(object sender, RequestBringIntoViewEventArgs requestBringIntoViewEventArgs)
+        private static void AssociatedObjectOnRequestBringIntoView(object sender, RequestBringIntoViewEventArgs requestBringIntoViewEventArgs)
         {
             
 
         }
 
-        private void AssociatedObjectOnLoaded(object sender, RoutedEventArgs routedEventArgs)
+        private static void AssociatedObjectOnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
             
         }
 
-        private void AssociatedObjectOnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        private static void AssociatedObjectOnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             
         }
 
-        private void AssociatedObjectOnInitialized(object sender, EventArgs eventArgs)
+        private static void AssociatedObjectOnInitialized(object sender, EventArgs eventArgs)
         {
             
         }

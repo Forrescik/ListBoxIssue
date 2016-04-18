@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 
 namespace ListBoxIssue.ViewModel

@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using GalaSoft.MvvmLight.Command;
@@ -42,15 +38,16 @@ namespace ListBoxIssue
             set { SetValue(SetScrollbarPositionProperty, value);}
         }
 
+        public static readonly DependencyProperty IsScrollFluentProperty = DependencyProperty.Register("IsScrollFluent", typeof(bool), typeof(ScrollListBoxBehavior), new PropertyMetadata(false));
+
+        public bool IsScrollFluent
+        {
+            get { return (bool) GetValue(IsScrollFluentProperty); }
+            set { SetValue(IsScrollFluentProperty, value);}
+        }
+
         private static void ScrollBarPositionCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            return;
-            var control = d as ScrollListBoxBehavior;
-            if (control != null)
-            {
-                var item = control.AssociatedObject.Items.GetItemAt(control.SetScrollbarPosition);
-                control.AssociatedObject.ScrollIntoViewCentered(item);
-            }
         }
 
         private void AssociatedObjectOnLoaded(object sender, RoutedEventArgs routedEventArgs)
@@ -64,25 +61,28 @@ namespace ListBoxIssue
             }
         }
 
-        private int lastKnownPosition;
+        private int _lastKnownPosition;
 
         private void ScrollViewerOnScrollChanged(object sender, ScrollChangedEventArgs scrollChangedEventArgs)
         {
-            if ((int) _scrollViewer.ContentVerticalOffset == 0 && lastKnownPosition != 0)
+            if ((int) _scrollViewer.ContentVerticalOffset == 0 && _lastKnownPosition != 0)
             {
                 if (IsOnTop != null)
                 {
                     IsOnTop.Execute(null);
+                    IsScrollFluent = true;
                     var item = AssociatedObject.Items.GetItemAt(SetScrollbarPosition);
                     AssociatedObject.ScrollIntoViewCentered(item);
+                    AssociatedObject.Items.MoveCurrentTo(item);
+                    IsScrollFluent = false;
+
                 }
             }
-            lastKnownPosition = (int)_scrollViewer.ContentVerticalOffset;
+            _lastKnownPosition = (int)_scrollViewer.ContentVerticalOffset;
             for (int i = 0; i < AssociatedObject.Items.Count; i++)
             {
                 ListBoxItem item = AssociatedObject.ItemContainerGenerator.ContainerFromIndex(i) as ListBoxItem;
-                if (item == null) continue;
-                var content = item.Content as MessageModel;
+                var content = item?.Content as MessageModel;
                 if (content != null && !content.IsRead)
                 {
                     if (ViewportHelper.IsInViewport(item))
@@ -108,7 +108,7 @@ namespace ListBoxIssue
             public static bool IsInViewport(Control item)
             {
                 if (item == null) return false;
-                ItemsControl itemsControl = null;
+                ItemsControl itemsControl;
                 if (item is ListBoxItem)
                 {
                     itemsControl = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
@@ -133,7 +133,7 @@ namespace ListBoxIssue
     {
         public static void ScrollIntoViewCentered(this ListBox listBox, object item)
         {
-            Debug.Assert(!VirtualizingStackPanel.GetIsVirtualizing(listBox),
+            Debug.Assert(!VirtualizingPanel.GetIsVirtualizing(listBox),
                 "VirtualizingStackPanel.IsVirtualizing must be disabled for ScrollIntoViewCentered to work.");
 
             // Get the container for the specified item
@@ -178,7 +178,7 @@ namespace ListBoxIssue
                     {
                         constrainingParent = VisualTreeHelper.GetParent(constrainingParent) as FrameworkElement;
                     } while ((null != constrainingParent) &&
-                             (listBox != constrainingParent) &&
+                             (!Equals(listBox, constrainingParent)) &&
                              !(constrainingParent is ScrollContentPresenter));
 
                     if (null != constrainingParent)
@@ -205,14 +205,14 @@ namespace ListBoxIssue
             for (Int32 i = 0; i < VisualTreeHelper.GetChildrenCount(referenceVisual); i++)
             {
                 child = VisualTreeHelper.GetChild(referenceVisual, i) as Visual;
-                if (child != null && child is T)
+                if (child is T)
                 {
                     break;
                 }
                 else if (child != null)
                 {
                     child = GetVisualChild<T>(child);
-                    if (child != null && child is T)
+                    if (child != null)
                     {
                         break;
                     }
@@ -230,9 +230,9 @@ namespace ListBoxIssue
                     children.Add((T)current);
                 }
 
-                for (int i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(current); i++)
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(current); i++)
                 {
-                    GetVisualChildren<T>(System.Windows.Media.VisualTreeHelper.GetChild(current, i), children);
+                    GetVisualChildren(VisualTreeHelper.GetChild(current, i), children);
                 }
             }
         }
@@ -246,26 +246,18 @@ namespace ListBoxIssue
 
             Collection<T> children = new Collection<T>();
 
-            GetVisualChildren<T>(current, children);
+            GetVisualChildren(current, children);
 
             return children;
         }
 
-        public static T GetVisualChild<T, P>(P templatedParent)
+        public static T GetVisualChild<T, TP>(TP templatedParent)
              where T : FrameworkElement
-             where P : FrameworkElement
+             where TP : FrameworkElement
         {
-            Collection<T> children = VisualTreeHelperTemp.GetVisualChildren<T>(templatedParent);
+            Collection<T> children = GetVisualChildren<T>(templatedParent);
 
-            foreach (T child in children)
-            {
-                if (child.TemplatedParent == templatedParent)
-                {
-                    return child;
-                }
-            }
-
-            return null;
+            return children.FirstOrDefault(child => Equals(child.TemplatedParent, templatedParent));
         }
 
     }

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
+﻿using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 
@@ -14,15 +7,12 @@ namespace ListBoxIssue.ViewModel
     public class MessageViewModel : ViewModelBase
     {
 
-        private RelayCommand _addNewItems;
+        private readonly RelayCommand _addNewItems;
 
-        public RelayCommand AddNewItems
-        {
-            get { return _addNewItems ?? new RelayCommand(AddItems); }
-        }
+        public RelayCommand AddNewItems => _addNewItems ?? new RelayCommand(AddItems);
 
-        private RelayCommand _addNewMessage;
-        public RelayCommand AddNewMessage { get { return _addNewMessage ?? new RelayCommand(NewMessage); } }
+        private readonly RelayCommand _addNewMessage;
+        public RelayCommand AddNewMessage => _addNewMessage ?? new RelayCommand(NewMessage);
 
         private void NewMessage()
         {
@@ -253,8 +243,10 @@ namespace ListBoxIssue.ViewModel
             };
         }
 
-        public MessageViewModel()
+        public MessageViewModel(RelayCommand addNewItems, RelayCommand addNewMessage)
         {
+            _addNewItems = addNewItems;
+            _addNewMessage = addNewMessage;
             InitializeList();
         }
     }
